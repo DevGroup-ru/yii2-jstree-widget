@@ -9,7 +9,8 @@ use yii\base\InvalidConfigException;
 use yii\caching\TagDependency;
 use yii\web\Response;
 
-class AdjacencyFullTreeDataAction extends Action {
+class AdjacencyFullTreeDataAction extends Action
+{
 
     public $class_name = null;
 

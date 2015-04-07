@@ -6,4 +6,8 @@ yii2-jstree-widget
 [![Build Status](https://scrutinizer-ci.com/g/DevGroup-ru/yii2-jstree-widget/badges/build.png?b=master)](https://scrutinizer-ci.com/g/DevGroup-ru/yii2-jstree-widget/build-status/master)
 
 
-jsTree tree widget for yii2
+jsTree tree widget for yii2.
+
+Current state: **unstable**.
+
+Created for use in [DotPlant2 E-Commerce CMS](http://dotplant.ru/).

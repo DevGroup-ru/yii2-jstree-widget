@@ -7,21 +7,22 @@ use yii\web\AssetBundle;
 
 /**
  * Asset bundle for jsTree widget
+ * Uses bower as jstree source.
  *
  * @package devgroup\JsTreeWidget
  */
-class JsTreeAssetBundle extends AssetBundle {
+class JsTreeAssetBundle extends AssetBundle
+{
     /**
      * @inheritdoc
      */
     public $depends = [
         'yii\web\JqueryAsset',
     ];
-
     /**
      * @inheritdoc
      */
-    public $sourcePath = '@vendor/vakata/jstree/dist';
+    public $sourcePath = '@bower/jstree/dist';
 
     /**
      * @inheritdoc
@@ -30,6 +31,9 @@ class JsTreeAssetBundle extends AssetBundle {
         'themes/default/style.min.css',
     ];
 
+    /**
+     * @inheritdoc
+     */
     public $js = [
         'jstree.min.js',
     ];

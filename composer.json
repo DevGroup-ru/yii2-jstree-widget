@@ -21,7 +21,7 @@
     "minimum-stability": "dev",
     "require": {
         "yiisoft/yii2": "*",
-        "vakata/jstree": "*"
+        "bower-asset/jstree": "*"
     },
     "autoload": {
         "psr-4": {

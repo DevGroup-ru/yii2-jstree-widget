@@ -8,7 +8,8 @@ use yii\helpers\Url;
 use yii\web\JsExpression;
 
 
-class ContextMenuHelper {
+class ContextMenuHelper
+{
 
     /**
      * Returns JavaScript expression(\yii\web\JsExpression) for context menu item.
