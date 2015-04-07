@@ -29,12 +29,16 @@ class ContextMenuHelper
 
         if (is_array($dataAttributes) === true) {
             // only selected set of attributes
-            foreach ($dataAttributes as $attribute) {
+            foreach ($dataAttributes as $attribute => $match) {
+                if (is_numeric($attribute) === true) {
+                    $attribute = $match;
+                }
                 $jsonAttribute = Json::encode($attribute);
+                $matchAttribute = Json::encode($match);
 
                 $dataExpression .= "
-                if (typeof(data[$jsonAttribute]) !== 'undefined') {
-                    dataVariables.push( '$attribute=' + encodeURIComponent(data[$jsonAttribute]) );
+                if (typeof(data[$matchAttribute]) !== 'undefined') {
+                    dataVariables.push( '$attribute=' + encodeURIComponent(data[$matchAttribute]) );
                 }\n";
 
             }
