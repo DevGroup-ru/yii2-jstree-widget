@@ -9,6 +9,35 @@ use yii\base\InvalidConfigException;
 use yii\caching\TagDependency;
 use yii\web\Response;
 
+/**
+ * Helper action for retrieving tree data for jstree by ajax.
+ * Example use in controller: 
+ *
+ * ``` php
+ * public function actions()
+ * {
+ *     return [
+ *         'getTree' => [
+ *             'class' => AdjacencyFullTreeDataAction::className(),
+ *             'class_name' => Category::className(),
+ *             'model_label_attribute' => 'name',
+ * 
+ *         ],
+ *         'upload' => [
+ *             'class' => UploadAction::className(),
+ *             'upload' => 'theme/resources/product-images',
+ *         ],
+ *         'remove' => [
+ *             'class' => RemoveAction::className(),
+ *             'uploadDir' => 'theme/resources/product-images',
+ *         ],
+ *         'save-info' => [
+ *             'class' => SaveInfoAction::className(),
+ *         ],
+ *     ];
+ * }
+ * ```
+ */
 class AdjacencyFullTreeDataAction extends Action
 {
 

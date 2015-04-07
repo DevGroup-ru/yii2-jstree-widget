@@ -12,6 +12,9 @@ use yii\web\JsExpression;
 use yii\helpers\ArrayHelper;
 use yii\web\View;
 
+/**
+ * JsTree widget for Yii Framework 2
+ */
 class TreeWidget extends Widget
 {
 
