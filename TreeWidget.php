@@ -75,6 +75,10 @@ class TreeWidget extends Widget
      */
     public $doubleClickAction = false;
 
+    public $changeParentAction = false;
+
+    public $reorderAction = false;
+
     public function run()
     {
         if (!is_array($this->treeDataRoute)) {
@@ -122,10 +126,38 @@ class TreeWidget extends Widget
                 return false;
             });\n";
         }
-
+        $changeParent = '';
+        if ($this->changeParentAction !== false) {
+            $changeParent ="
+             jsTree_$id.bind('move_node.jstree', function(e, data) {
+                jQuery.get(
+                    '" . $this->changeParentAction . "',
+                    {
+                        'id': data.node.id,
+                        'parent_id': data.parent
+                    }
+                );
+                return false;
+            });\n";
+        }
+        $reorder = '';
+        if ($this->reorderAction !== false) {
+            $reorder ="
+             jsTree_$id.bind('move_node.jstree', function(e, data) {
+             var params = [];
+                 jQuery('.jstree-node').each(function(i, e) {
+                    params[e.id] = i;
+                 });
+                  jQuery.post(
+                    '" . $this->reorderAction . "',
+                    {'order':params }
+                );
+                return false;
+            });\n";
+        }
         $this->getView()->registerJs("
         var jsTree_$id = \$('#$id').jstree($options);
-        $doubleClick", View::POS_READY);
+        $doubleClick $changeParent $reorder", View::POS_READY);
         return Html::tag('div', '', ['id' => $id]);
     }
 
