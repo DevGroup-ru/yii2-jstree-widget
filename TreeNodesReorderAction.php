@@ -6,26 +6,16 @@ use yii\base\InvalidConfigException;
 use yii\web\NotFoundHttpException;
 /**
  * Helper action to change sort_order attribute via JsTree Drag&Drop
- * Example use in controller:
+ * Example usage in controller:
  * ``` php
  * public function actions()
  * {
  *     return [
- *         'move' => [
+ *         'reorder' => [
  *             'class' => TreeNodesReorderAction::className(),
  *             'class_name' => Category::className(),
  *         ],
- *         'upload' => [
- *             'class' => UploadAction::className(),
- *             'upload' => 'theme/resources/product-images',
- *         ],
- *         'remove' => [
- *             'class' => RemoveAction::className(),
- *             'uploadDir' => 'theme/resources/product-images',
- *         ],
- *         'save-info' => [
- *             'class' => SaveInfoAction::className(),
- *         ],
+ *         ...
  *     ];
  * }
  * ```

@@ -5,8 +5,8 @@ use yii\base\Action;
 use yii\base\InvalidConfigException;
 use yii\web\NotFoundHttpException;
 /**
- * Helper action to change parent_ad attribute via JsTree Drag&Drop
- * Example use in controller:
+ * Helper action to change parent_id attribute via JsTree Drag&Drop
+ * Example usage in controller:
  * ``` php
  * public function actions()
  * {
@@ -15,17 +15,7 @@ use yii\web\NotFoundHttpException;
  *             'class' => TreeNodeMoveAction::className(),
  *             'class_name' => Category::className(),
  *         ],
- *         'upload' => [
- *             'class' => UploadAction::className(),
- *             'upload' => 'theme/resources/product-images',
- *         ],
- *         'remove' => [
- *             'class' => RemoveAction::className(),
- *             'uploadDir' => 'theme/resources/product-images',
- *         ],
- *         'save-info' => [
- *             'class' => SaveInfoAction::className(),
- *         ],
+ *         ...
  *     ];
  * }
  * ```
@@ -50,7 +40,10 @@ class TreeNodeMoveAction extends Action{
     {
         $this->parentId = Yii::$app->request->get('parent_id');
         $class = $this->className;
-        if (null === $id || null === $this->parentId || (null === $model = $class::findById($id)) || (null === $parent = $class::findById($this->parentId))) {
+        if (null === $id
+            || null === $this->parentId
+            || (null === $model = $class::findById($id))
+            || (null === $parent = $class::findById($this->parentId))) {
             throw new NotFoundHttpException;
         }
         $model->{$this->modelParentIdField} = $parent->id;
