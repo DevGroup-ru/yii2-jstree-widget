@@ -11,7 +11,7 @@ use yii\web\Response;
 
 /**
  * Helper action for retrieving tree data for jstree by ajax.
- * Example use in controller: 
+ * Example use in controller:
  *
  * ``` php
  * public function actions()
@@ -21,7 +21,7 @@ use yii\web\Response;
  *             'class' => AdjacencyFullTreeDataAction::className(),
  *             'class_name' => Category::className(),
  *             'model_label_attribute' => 'name',
- * 
+ *
  *         ],
  *         'upload' => [
  *             'class' => UploadAction::className(),
@@ -52,6 +52,9 @@ class AdjacencyFullTreeDataAction extends Action
     public $vary_by_type_attribute = null;
 
     public $query_parent_attribute = 'id';
+
+    public $query_sort_order = 'sort_order';
+
     public $query_selected_attribute = 'selected_id';
     /**
      * Additional conditions for retrieving tree(ie. don't display nodes marked as deleted)
@@ -96,7 +99,7 @@ class AdjacencyFullTreeDataAction extends Action
         if (false === $result = Yii::$app->cache->get($cacheKey)) {
 
             $query = $class::find()
-                ->orderBy($this->model_id_attribute . ' ASC');
+                ->orderBy($this->query_sort_order . ' ASC');
 
             if (count($this->whereCondition) > 0) {
                 $query = $query->where($this->whereCondition);
