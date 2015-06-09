@@ -54,7 +54,7 @@ class ContextMenuHelper
         $dataExpression .= "dataVariables=dataVariables.join('&'); ";
         return new JsExpression(
             "function(node) {
-                var \$object = \$(node.reference[0]);
+                var \$object = node.reference ? \$(node.reference[0]) : node;
                 $dataExpression
                 document.location = $baseUrl + '$union' + dataVariables;
                 return false;
