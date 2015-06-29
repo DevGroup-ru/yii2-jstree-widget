@@ -1,9 +1,13 @@
 <?php
+
 namespace devgroup\JsTreeWidget;
+
 use Yii;
 use yii\base\Action;
 use yii\base\InvalidConfigException;
-use yii\web\NotFoundHttpException;
+use yii\db\ActiveRecord;
+use yii\web\BadRequestHttpException;
+
 /**
  * Helper action to change sort_order attribute via JsTree Drag&Drop
  * Example usage in controller:
@@ -21,7 +25,8 @@ use yii\web\NotFoundHttpException;
  * ```
  */
 
-class TreeNodesReorderAction extends Action{
+class TreeNodesReorderAction extends Action
+{
     public $className = null;
     public $modelSortOrderField = 'sort_order';
     public $sortOrder = [];
@@ -36,24 +41,29 @@ class TreeNodesReorderAction extends Action{
         }
         $this->sortOrder = Yii::$app->request->post('order');
         if (empty($this->sortOrder)) {
-            throw new NotFoundHttpException;
+            throw new BadRequestHttpException;
         }
     }
 
     public function run()
     {
+        /** @var ActiveRecord $class */
         $class = $this->className;
+        $sortOrderField = Yii::$app->db->quoteColumnName($this->modelSortOrderField);
         $case = 'CASE `id`';
         foreach ($this->sortOrder as $id => $sort_order) {
+            if ($sort_order === '') {
+                continue;
+            }
             $case .= ' when "' . $id . '" then "' . $sort_order . '"';
         }
         $case .= ' END';
         $sql = "UPDATE "
             . $class::tableName()
-            . " SET sort_order = "
+            . " SET " . $sortOrderField . " = "
             . $case
-            . " WHERE id IN(" . implode(', ', array_keys($this->sortOrder))
+            . " WHERE `id` IN(" . implode(', ', array_keys($this->sortOrder))
             . ")";
-        \Yii::$app->db->createCommand($sql)->execute();
+        Yii::$app->db->createCommand($sql)->execute();
     }
 }

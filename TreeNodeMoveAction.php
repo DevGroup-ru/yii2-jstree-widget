@@ -1,9 +1,13 @@
 <?php
+
 namespace devgroup\JsTreeWidget;
+
 use Yii;
 use yii\base\Action;
 use yii\base\InvalidConfigException;
+use yii\db\ActiveRecord;
 use yii\web\NotFoundHttpException;
+
 /**
  * Helper action to change parent_id attribute via JsTree Drag&Drop
  * Example usage in controller:
@@ -21,10 +25,12 @@ use yii\web\NotFoundHttpException;
  * ```
  */
 
-class TreeNodeMoveAction extends Action{
+class TreeNodeMoveAction extends Action
+{
     public $className = null;
     public $modelParentIdField = 'parent_id';
     public $parentId = null;
+    public $saveAttributes = [];
 
     public function init()
     {
@@ -33,6 +39,9 @@ class TreeNodeMoveAction extends Action{
         }
         if (!class_exists($this->className)) {
             throw new InvalidConfigException("Model class does not exists");
+        }
+        if (!in_array($this->modelParentIdField, $this->saveAttributes)) {
+            $this->saveAttributes[] = $this->modelParentIdField;
         }
     }
 
@@ -46,7 +55,8 @@ class TreeNodeMoveAction extends Action{
             || (null === $parent = $class::findById($this->parentId))) {
             throw new NotFoundHttpException;
         }
+        /** @var ActiveRecord $model */
         $model->{$this->modelParentIdField} = $parent->id;
-        $model->save();
+        $model->save(true, $this->saveAttributes);
     }
 }
