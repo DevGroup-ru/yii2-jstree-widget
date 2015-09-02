@@ -52,8 +52,8 @@ class TreeNodesReorderAction extends Action
         $sortOrderField = Yii::$app->db->quoteColumnName($this->modelSortOrderField);
         $case = 'CASE `id`';
         foreach ($this->sortOrder as $id => $sort_order) {
-            if ($sort_order === '') {
-                continue;
+            if (empty($sort_order) === true) {
+                $sort_order = 0;
             }
             $case .= ' when "' . $id . '" then "' . $sort_order . '"';
         }
