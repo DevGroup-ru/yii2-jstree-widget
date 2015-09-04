@@ -51,18 +51,20 @@ class TreeNodesReorderAction extends Action
         $class = $this->className;
         $sortOrderField = Yii::$app->db->quoteColumnName($this->modelSortOrderField);
         $case = 'CASE `id`';
+        $newSortOrders = [];
         foreach ($this->sortOrder as $id => $sort_order) {
-            if (empty($sort_order) === true) {
-                $sort_order = 0;
+            if ($sort_order === '' || $sort_order === null) {
+                continue;
             }
             $case .= ' when "' . $id . '" then "' . $sort_order . '"';
+            $newSortOrders[$id] = $sort_order;
         }
         $case .= ' END';
         $sql = "UPDATE "
             . $class::tableName()
             . " SET " . $sortOrderField . " = "
             . $case
-            . " WHERE `id` IN(" . implode(', ', array_keys($this->sortOrder))
+            . " WHERE `id` IN(" . implode(', ', array_keys($newSortOrders))
             . ")";
         Yii::$app->db->createCommand($sql)->execute();
     }
