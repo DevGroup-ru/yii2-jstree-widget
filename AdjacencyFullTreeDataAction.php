@@ -97,7 +97,6 @@ class AdjacencyFullTreeDataAction extends Action
         $cacheKey = "AdjacencyFullTreeData:".$this->cacheKey.":$class";
 
         if (false === $result = Yii::$app->cache->get($cacheKey)) {
-
             $query = $class::find()
                 ->orderBy($this->query_sort_order . ' ASC');
 
@@ -130,13 +129,11 @@ class AdjacencyFullTreeDataAction extends Action
                 $cacheKey,
                 $result,
                 86400,
-                new TagDependency(
-                    [
-                        'tags' => [
-                            ActiveRecordHelper::getCommonTag($class),
-                        ],
-                    ]
-                )
+                new TagDependency([
+                    'tags' => [
+                        ActiveRecordHelper::getCommonTag($class),
+                    ],
+                ])
             );
         }
 
@@ -145,6 +142,5 @@ class AdjacencyFullTreeDataAction extends Action
         }
 
         return array_values($result);
-
     }
 } 
