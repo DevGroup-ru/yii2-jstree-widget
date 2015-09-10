@@ -94,7 +94,7 @@ class AdjacencyFullTreeDataAction extends Action
             $current_selected_id = Yii::$app->request->get($this->query_parent_attribute);
         }
 
-        $cacheKey = "AdjacencyFullTreeData:".$this->cacheKey.":$class";
+        $cacheKey = "AdjacencyFullTreeData:{$this->cacheKey}:{$class}:{$this->query_sort_order}";
 
         if (false === $result = Yii::$app->cache->get($cacheKey)) {
             $query = $class::find()
