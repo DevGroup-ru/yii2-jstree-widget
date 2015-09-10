@@ -98,7 +98,7 @@ class AdjacencyFullTreeDataAction extends Action
 
         if (false === $result = Yii::$app->cache->get($cacheKey)) {
             $query = $class::find()
-                ->orderBy($this->query_sort_order . ' ASC');
+                ->orderBy([$this->query_sort_order => SORT_ASC]);
 
             if (count($this->whereCondition) > 0) {
                 $query = $query->where($this->whereCondition);
