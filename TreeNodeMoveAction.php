@@ -29,6 +29,7 @@ class TreeNodeMoveAction extends Action
 {
     public $className = null;
     public $modelParentIdField = 'parent_id';
+    public $modelCategoryGroupIdField = 'category_group_id';
     public $parentId = null;
     public $saveAttributes = [];
 
@@ -42,6 +43,9 @@ class TreeNodeMoveAction extends Action
         }
         if (!in_array($this->modelParentIdField, $this->saveAttributes)) {
             $this->saveAttributes[] = $this->modelParentIdField;
+        }
+        if (!in_array($this->modelCategoryGroupIdField, $this->saveAttributes)) {
+            $this->saveAttributes[] = $this->modelCategoryGroupIdField;
         }
     }
 
@@ -57,6 +61,7 @@ class TreeNodeMoveAction extends Action
         }
         /** @var ActiveRecord $model */
         $model->{$this->modelParentIdField} = $parent->id;
+        $model->{$this->modelCategoryGroupIdField} = $parent->category_group_id;
         $model->save(true, $this->saveAttributes);
     }
 }
