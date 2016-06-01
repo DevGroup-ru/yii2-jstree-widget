@@ -2,7 +2,7 @@
     "name": "devgroup/yii2-jstree-widget",
     "description": "jsTree widget for yii2",
     "type": "yii2-extension",
-    "keywords": ["yii2","jstree","tree","widget"],
+    "keywords": ["yii2","jstree","tree","widget","nested-sets"],
     "license": "MIT",
     "authors": [
         {
@@ -20,12 +20,13 @@
     ],
     "minimum-stability": "dev",
     "require": {
-        "yiisoft/yii2": "*",
-        "bower-asset/jstree": "*"
+        "yiisoft/yii2": "~2.0.0",
+        "bower-asset/jstree": "*",
+        "devgroup/yii2-tag-dependency-helper": "~0.0.1"
     },
     "autoload": {
         "psr-4": {
-            "devgroup\\JsTreeWidget\\": ""
+            "devgroup\\JsTreeWidget\\": "src/"
         }
     }
 }

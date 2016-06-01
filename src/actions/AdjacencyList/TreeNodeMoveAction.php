@@ -1,6 +1,6 @@
 <?php
 
-namespace devgroup\JsTreeWidget;
+namespace devgroup\JsTreeWidget\actions\AdjacencyList;
 
 use Yii;
 use yii\base\Action;

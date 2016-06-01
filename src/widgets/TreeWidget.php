@@ -1,6 +1,6 @@
 <?php
 
-namespace devgroup\JsTreeWidget;
+namespace devgroup\JsTreeWidget\widgets;
 
 use Yii;
 use yii\base\InvalidConfigException;
@@ -114,7 +114,7 @@ class TreeWidget extends Widget
 
         $options = Json::encode($options);
 
-        $this->getView()->registerAssetBundle('devgroup\JsTreeWidget\JsTreeAssetBundle');
+        $this->getView()->registerAssetBundle('devgroup\JsTreeWidget\widgets\JsTreeAssetBundle');
 
         $doubleClick = '';
         if ($this->doubleClickAction !== false) {
@@ -180,4 +180,4 @@ class TreeWidget extends Widget
         }
         return $options;
     }
-} 
+}

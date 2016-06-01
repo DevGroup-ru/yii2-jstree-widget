@@ -1,6 +1,6 @@
 <?php
 
-namespace devgroup\JsTreeWidget;
+namespace devgroup\JsTreeWidget\widgets;
 
 use Yii;
 use yii\web\AssetBundle;
@@ -37,4 +37,4 @@ class JsTreeAssetBundle extends AssetBundle
     public $js = [
         'jstree.min.js',
     ];
-} 
+}

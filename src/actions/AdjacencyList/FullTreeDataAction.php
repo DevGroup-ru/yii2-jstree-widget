@@ -1,6 +1,6 @@
 <?php
 
-namespace devgroup\JsTreeWidget;
+namespace devgroup\JsTreeWidget\actions\AdjacencyList;
 
 use devgroup\TagDependencyHelper\ActiveRecordHelper;
 use Yii;
@@ -38,7 +38,7 @@ use yii\web\Response;
  * }
  * ```
  */
-class AdjacencyFullTreeDataAction extends Action
+class FullTreeDataAction extends Action
 {
 
     public $class_name = null;
@@ -143,4 +143,4 @@ class AdjacencyFullTreeDataAction extends Action
 
         return array_values($result);
     }
-} 
+}
