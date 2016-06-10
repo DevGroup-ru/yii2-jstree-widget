@@ -210,7 +210,9 @@ class TreeWidget extends Widget
             $js = new JsExpression(
                 "jsTree_{$this->getId()}.on('move_node.jstree', function(e, data) {
                     \$parent = $(this).jstree(true).get_node(data.parent);
+                    \$oldParent = $(this).jstree(true).get_node(data.old_parent);
                     siblings = \$parent.children || {};
+                    oldSiblings = \$oldParent.children || {};
                     $.post(
                         '{$url}',
                          {
@@ -220,7 +222,8 @@ class TreeWidget extends Widget
                             'old_parent': data.old_parent,
                             'old_position': data.old_position,
                             'is_multi': data.is_multi,
-                            'siblings': siblings
+                            'siblings': siblings,
+                            'oldSiblings' : oldSiblings
                          }
                     );
                     return false;
