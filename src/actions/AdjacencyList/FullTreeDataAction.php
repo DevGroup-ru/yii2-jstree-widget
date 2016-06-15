@@ -19,8 +19,8 @@ use yii\web\Response;
  *     return [
  *         'getTree' => [
  *             'class' => AdjacencyFullTreeDataAction::className(),
- *             'class_name' => Category::className(),
- *             'model_label_attribute' => 'name',
+ *             'className' => Category::className(),
+ *             'modelLabelAttribute' => 'name',
  *
  *         ],
  *         'upload' => [
@@ -41,21 +41,21 @@ use yii\web\Response;
 class FullTreeDataAction extends Action
 {
 
-    public $class_name = null;
+    public $className = null;
 
-    public $model_id_attribute = 'id';
+    public $modelIdAttribute = 'id';
 
-    public $model_label_attribute = 'name';
+    public $modelLabelAttribute = 'name';
 
-    public $model_parent_attribute = 'parent_id';
+    public $modelParentAttribute = 'parent_id';
 
-    public $vary_by_type_attribute = null;
+    public $varyByTypeAttribute = null;
 
-    public $query_parent_attribute = 'id';
+    public $queryParentAttribute = 'id';
 
-    public $query_sort_order = 'sort_order';
+    public $querySortOrder = 'sort_order';
 
-    public $query_selected_attribute = 'selected_id';
+    public $querySelectedAttribute = 'selected_id';
     /**
      * Additional conditions for retrieving tree(ie. don't display nodes marked as deleted)
      * @var array
@@ -76,10 +76,10 @@ class FullTreeDataAction extends Action
 
     public function init()
     {
-        if (!isset($this->class_name)) {
+        if (!isset($this->className)) {
             throw new InvalidConfigException("Model name should be set in controller actions");
         }
-        if (!class_exists($this->class_name)) {
+        if (!class_exists($this->className)) {
             throw new InvalidConfigException("Model class does not exists");
         }
     }
@@ -88,17 +88,17 @@ class FullTreeDataAction extends Action
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
 
-        $class = $this->class_name;
+        $class = $this->className;
 
-        if (null === $current_selected_id = Yii::$app->request->get($this->query_selected_attribute)) {
-            $current_selected_id = Yii::$app->request->get($this->query_parent_attribute);
+        if (null === $current_selected_id = Yii::$app->request->get($this->querySelectedAttribute)) {
+            $current_selected_id = Yii::$app->request->get($this->queryParentAttribute);
         }
 
-        $cacheKey = "AdjacencyFullTreeData:{$this->cacheKey}:{$class}:{$this->query_sort_order}";
+        $cacheKey = "AdjacencyFullTreeData:{$this->cacheKey}:{$class}:{$this->querySortOrder}";
 
         if (false === $result = Yii::$app->cache->get($cacheKey)) {
             $query = $class::find()
-                ->orderBy([$this->query_sort_order => SORT_ASC]);
+                ->orderBy([$this->querySortOrder => SORT_ASC]);
 
             if (count($this->whereCondition) > 0) {
                 $query = $query->where($this->whereCondition);
@@ -112,17 +112,20 @@ class FullTreeDataAction extends Action
 
             foreach ($rows as $row) {
                 $item = [
-                    'id' => $row[$this->model_id_attribute],
-                    'parent' => ($row[$this->model_parent_attribute] > 0) ? $row[$this->model_parent_attribute] : '#',
-                    'text' => $row[$this->model_label_attribute],
-                    'a_attr' => ['data-id'=>$row[$this->model_id_attribute], 'data-parent_id'=>$row[$this->model_parent_attribute]],
+                    'id' => $row[$this->modelIdAttribute],
+                    'parent' => ($row[$this->modelParentAttribute] > 0) ? $row[$this->modelParentAttribute] : '#',
+                    'text' => $row[$this->modelLabelAttribute],
+                    'a_attr' => [
+                        'data-id' => $row[$this->modelIdAttribute],
+                        'data-parent_id' => $row[$this->modelParentAttribute]
+                    ],
                 ];
 
-                if (null !== $this->vary_by_type_attribute) {
-                    $item['type'] = $row[$this->vary_by_type_attribute];
+                if (null !== $this->varyByTypeAttribute) {
+                    $item['type'] = $row[$this->varyByTypeAttribute];
                 }
 
-                $result[$row[$this->model_id_attribute]] = $item;
+                $result[$row[$this->modelIdAttribute]] = $item;
             }
 
             Yii::$app->cache->set(
@@ -138,7 +141,10 @@ class FullTreeDataAction extends Action
         }
 
         if (array_key_exists($current_selected_id, $result)) {
-            $result[$current_selected_id] = array_merge($result[$current_selected_id], ['state' => ['opened' => true, 'selected' => true]]);
+            $result[$current_selected_id] = array_merge(
+                $result[$current_selected_id],
+                ['state' => ['opened' => true, 'selected' => true]]
+            );
         }
 
         return array_values($result);

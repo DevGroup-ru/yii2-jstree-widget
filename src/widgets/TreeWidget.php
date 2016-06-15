@@ -79,10 +79,35 @@ class TreeWidget extends Widget
      */
     public $doubleClickAction = false;
 
+    /** @var bool|array route to change parent action (applicable to Adjacency List only) */
     public $changeParentAction = false;
 
+    /** @var bool|array route to reorder action */
     public $reorderAction = false;
 
+    /** @var bool plugin config option for allow multiple nodes selections or not */
+    public $multiSelect = false;
+
+    /**
+     * @inheritdoc
+     */
+    public function init()
+    {
+        self::registerTranslations();
+        parent::init();
+    }
+
+    public static function registerTranslations()
+    {
+        Yii::$app->i18n->translations['jstw'] = [
+            'class' => 'yii\i18n\PhpMessageSource',
+            'basePath' => dirname(__DIR__) . DIRECTORY_SEPARATOR . 'messages',
+        ];
+    }
+
+    /**
+     * @inheritdoc
+     */
     public function run()
     {
         if (!is_array($this->treeDataRoute)) {
@@ -93,17 +118,23 @@ class TreeWidget extends Widget
             'plugins' => $this->plugins,
             'core' => [
                 'check_callback' => true,
+                'multiple' => $this->multiSelect,
                 'data' => [
                     'url' => new JsExpression(
                         "function (node) {
                             return " . Json::encode(Url::to($this->treeDataRoute)) . ";
                         }"
                     ),
-                    'data' => new JsExpression(
+                    'success' => new JsExpression(
                         "function (node) {
-                        return { 'id' : node.id };
+                            return { 'id' : node.id };
                         }"
                     ),
+                    'error' => new JsExpression(
+                        "function ( o, textStatus, errorThrown ) {
+                            alert(o.responseText);
+                        }"
+                    )
                 ]
             ]
         ];
@@ -135,6 +166,9 @@ class TreeWidget extends Widget
         return Html::tag('div', '', ['id' => $this->getId()]);
     }
 
+    /**
+     * @return array
+     */
     private function contextMenuOptions()
     {
         $options = [];
@@ -155,81 +189,115 @@ class TreeWidget extends Widget
         return $options;
     }
 
+    /**
+     * Prepares js according to given tree type
+     *
+     * @return string
+     */
     private function prepareJs()
     {
         switch ($this->treeType) {
             case self::TREE_TYPE_ADJACENCY :
-                return $this->adjacecncyJs();
+                return $this->adjacencyJs();
             case self::TREE_TYPE_NESTED_SET :
                 return $this->nestedSetJs();
         }
     }
 
-    private function adjacecncyJs()
+    /**
+     * @return string
+     */
+    private function adjacencyJs()
     {
-        $changeParent = '';
+        $changeParentJs = '';
         if ($this->changeParentAction !== false) {
             $changeParentUrl = is_array($this->changeParentAction) ? Url::to($this->changeParentAction) : $this->changeParentAction;
-            $changeParent = "
-             jsTree_{$this->getId()}.bind('move_node.jstree', function(e, data) {
-                jQuery.get(
-                    '" . $changeParentUrl . "',
-                    {
+            $changeParentJs = <<<JS
+             jsTree_{$this->getId()}.on('move_node.jstree', function(e, data) {
+                var \$this = $(this);
+                $.get('$changeParentUrl', {
                         'id': data.node.id,
                         'parent_id': data.parent
-                    }
-                );
+                    }, "json")
+                    .done(function (data) {
+                        if ('undefined' !== typeof(data.error)) {
+                            alert(data.error);
+                        }
+                        \$this.jstree('refresh');
+                    })
+                    .fail(function ( o, textStatus, errorThrown ) {
+                        alert(o.responseText);
+                    });
                 return false;
-            });\n";
+            });
+JS;
         }
-        $reorder = '';
+
+        $reorderJs = '';
         if ($this->reorderAction !== false) {
             $reorderUrl = is_array($this->reorderAction) ? Url::to($this->reorderAction) : $this->reorderAction;
-            $reorder = "
-             jsTree_{$this->getId()}.bind('move_node.jstree', function(e, data) {
-             var params = [];
-                 jQuery('.jstree-node').each(function(i, e) {
+            $reorderJs = <<<JS
+            jsTree_{$this->getId()}.on('move_node.jstree', function(e, data) {
+                var params = [];
+                $('.jstree-node').each(function(i, e) {
                     params[e.id] = i;
-                 });
-                  jQuery.post(
-                    '" . $reorderUrl . "',
+                });
+                $.post('$reorderUrl',
                     {'order':params }
-                );
+                    , "json")
+                    .done(function (data) {
+                        if ('undefined' !== typeof(data.error)) {
+                            alert(data.error);
+                        }
+                        \$this.jstree('refresh');
+                    })
+                    .fail(function ( o, textStatus, errorThrown ) {
+                        alert(o.responseText);
+                    });
                 return false;
-            });\n";
+            });
+JS;
         }
-        return $changeParent . $reorder;
+        return $changeParentJs . "\n" . $reorderJs . "\n";
     }
 
+    /**
+     * @return string
+     */
     private function nestedSetJs()
     {
         $js = "";
         if (false !== $this->reorderAction || false !== $this->changeParentAction) {
             $action = $this->reorderAction ?: $this->changeParentAction;
             $url = is_array($action) ? Url::to($action) : $action;
-            $js = new JsExpression(
-                "jsTree_{$this->getId()}.on('move_node.jstree', function(e, data) {
-                    \$parent = $(this).jstree(true).get_node(data.parent);
-                    \$oldParent = $(this).jstree(true).get_node(data.old_parent);
-                    siblings = \$parent.children || {};
-                    oldSiblings = \$oldParent.children || {};
-                    $.post(
-                        '{$url}',
-                         {
+            $js = <<<JS
+                jsTree_{$this->getId()}.on('move_node.jstree', function(e, data) {
+                    var \$this = $(this),
+                        \$parent = \$this.jstree(true).get_node(data.parent),
+                        \$oldParent = \$this.jstree(true).get_node(data.old_parent),
+                        siblings = \$parent.children || {};
+                    $.post('$url', {
                             'node_id' : data.node.id,
                             'parent': data.parent,
                             'position': data.position,
                             'old_parent': data.old_parent,
                             'old_position': data.old_position,
                             'is_multi': data.is_multi,
-                            'siblings': siblings,
-                            'oldSiblings' : oldSiblings
-                         }
-                    );
+                            'siblings': siblings
+                         }, "json")
+                         .done(function (data) {
+                            if ('undefined' !== typeof(data.error)) {
+                                alert(data.error);
+                            }
+                            \$this.jstree('refresh');
+                         })
+                         .fail(function ( o, textStatus, errorThrown ) {
+                            alert(o.responseText);
+                         });
                     return false;
-                });\n"
-            );
+                });
+JS;
         }
-        return $js;
+        return $js . "\n";
     }
 }

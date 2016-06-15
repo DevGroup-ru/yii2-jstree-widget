@@ -2,6 +2,7 @@
 
 namespace devgroup\JsTreeWidget\actions\nestedset;
 
+use devgroup\JsTreeWidget\widgets\TreeWidget;
 use yii\base\Action;
 use yii\base\InvalidConfigException;
 use yii\db\ActiveRecord;
@@ -9,21 +10,29 @@ use Yii;
 use yii\db\Query;
 use yii\web\Response;
 
+/**
+ * Class FullTreeDataAction
+ *
+ * @package devgroup\JsTreeWidget\actions\nestedset
+ */
 class FullTreeDataAction extends Action
 {
     /** @var string */
     public $leftAttribute = 'lft';
     /** @var string */
     public $rightAttribute = 'rgt';
-    /** @var string set name for multi root tree */
+    /** @var string set root column name for multi root tree */
     public $rootAttribute = false;
     /** @var  ActiveRecord */
     public $className;
     /** @var string */
     public $modelLabelAttribute = 'name';
-
+    /** @var  string */
     private $tableName;
 
+    /**
+     * @inheritdoc
+     */
     public function init()
     {
         if (true === empty($this->className) || false === is_subclass_of($this->className, ActiveRecord::class)) {
@@ -48,8 +57,13 @@ class FullTreeDataAction extends Action
                 . "not found in the '{$this->tableName}' columns list"
             );
         }
+        TreeWidget::registerTranslations();
+        parent::init();
     }
 
+    /**
+     * @inheritdoc
+     */
     public function run()
     {
         $selectArray = [
@@ -88,8 +102,8 @@ class FullTreeDataAction extends Action
         $res = [];
         foreach ($data as $row) {
             $currentRoot = isset($row[$this->rootAttribute]) ? $row[$this->rootAttribute] : 0;
-            if (is_null($rgt) || $row[$this->rightAttribute] < $rgt) {
-                if ($lft + 1 == $row[$this->leftAttribute] && $root == $currentRoot) {
+            if (is_null($rgt) || $row[$this->rightAttribute] < $rgt && $root == $currentRoot) {
+                if ($lft + 1 == $row[$this->leftAttribute]) {
                     if ($row[$this->leftAttribute] + 1 !== $row[$this->rightAttribute]) {
                         $res[] = [
                             'id' => $row['id'],

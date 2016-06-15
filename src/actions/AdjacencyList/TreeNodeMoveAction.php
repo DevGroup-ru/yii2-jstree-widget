@@ -2,9 +2,11 @@
 
 namespace devgroup\JsTreeWidget\actions\AdjacencyList;
 
+use devgroup\TagDependencyHelper\ActiveRecordHelper;
 use Yii;
 use yii\base\Action;
 use yii\base\InvalidConfigException;
+use yii\caching\TagDependency;
 use yii\db\ActiveRecord;
 use yii\web\NotFoundHttpException;
 
@@ -51,12 +53,16 @@ class TreeNodeMoveAction extends Action
         $class = $this->className;
         if (null === $id
             || null === $this->parentId
-            || (null === $model = $class::findById($id))
-            || (null === $parent = $class::findById($this->parentId))) {
+            || (null === $model = $class::findOne($id))
+            || (null === $parent = $class::findOne($this->parentId))) {
             throw new NotFoundHttpException;
         }
         /** @var ActiveRecord $model */
         $model->{$this->modelParentIdField} = $parent->id;
-        $model->save(true, $this->saveAttributes);
+        TagDependency::invalidate(
+            Yii::$app->cache,
+            ActiveRecordHelper::getCommonTag($class)
+        );
+        return $model->save(true, $this->saveAttributes);
     }
 }
