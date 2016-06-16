@@ -18,22 +18,12 @@ use yii\web\Response;
  * {
  *     return [
  *         'getTree' => [
- *             'class' => AdjacencyFullTreeDataAction::className(),
- *             'className' => Category::className(),
+ *             'class' => AdjacencyFullTreeDataAction::class,
+ *             'className' => Category::class,
  *             'modelLabelAttribute' => 'name',
  *
  *         ],
- *         'upload' => [
- *             'class' => UploadAction::className(),
- *             'upload' => 'theme/resources/product-images',
- *         ],
- *         'remove' => [
- *             'class' => RemoveAction::className(),
- *             'uploadDir' => 'theme/resources/product-images',
- *         ],
- *         'save-info' => [
- *             'class' => SaveInfoAction::className(),
- *         ],
+ *     ...
  *     ];
  * }
  * ```

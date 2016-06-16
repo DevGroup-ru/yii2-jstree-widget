@@ -21,11 +21,11 @@ class NodeMoveAction extends Action
     public $className;
     /** @var string set root column name for multi root tree */
     public $rootAttribute = false;
-    /** @var string  */
+    /** @var string */
     public $leftAttribute = 'lft';
-    /** @var string  */
+    /** @var string */
     public $rightAttribute = 'rgt';
-    /** @var string  */
+    /** @var string */
     public $depthAttribute = 'depth';
 
     /** @var  ActiveRecord */
@@ -113,8 +113,6 @@ class NodeMoveAction extends Action
         }
         $nodeId = $siblings[$position];
         $class = $this->className;
-        $lr = $workWith = [];
-        $nodeOperator = $siblingsOperator = '';
         if ($oldPosition > $position) {
             //change next
             $nodeOperator = '-';
@@ -212,7 +210,7 @@ class NodeMoveAction extends Action
             $compareRight = $this->parent->{$this->leftAttribute} + 1;
         } else {
             if (false === isset($siblings[$position - 1])) {
-                return ['error' => Yii::t('jstw', 'New previous sibling not exists')];
+                return ['error' => Yii::t('jstw', 'New previous sibling does not exist')];
             }
             $newPrevSiblingId = $siblings[$position - 1];
             $newPrevSiblingData = $this->getLr($newPrevSiblingId);
@@ -221,9 +219,9 @@ class NodeMoveAction extends Action
         if ($this->node->{$this->leftAttribute} > $compareRight) {
             //move node up
             if ($position == 0) {
-                $leftFrom = $this->parent->{$this->leftAttribute} + 1;
+                $leftFrom = $compareRight;
             } else {
-                $leftFrom = $newPrevSiblingData[$newPrevSiblingId][$this->rightAttribute] + 1;
+                $leftFrom = $compareRight + 1;
             }
             $rightTo = $this->node->{$this->leftAttribute};
             $nodeDelta = $this->node->{$this->leftAttribute} - $leftFrom;
@@ -235,9 +233,9 @@ class NodeMoveAction extends Action
             //move node down
             $leftFrom = $this->node->{$this->rightAttribute};
             if ($position == 0) {
-                $rightTo = $this->parent->{$this->leftAttribute};
+                $rightTo = $compareRight - 1;
             } else {
-                $rightTo = $newPrevSiblingData[$newPrevSiblingId][$this->rightAttribute];
+                $rightTo = $compareRight;
             }
             $nodeOperator = '+';
             $parentOperator = $siblingsOperator = '-';
@@ -344,6 +342,9 @@ class NodeMoveAction extends Action
     private function moveMultiRoot($position = null, $siblings = [], $oldParentId)
     {
         $class = $this->className;
+        if ((int)$oldParentId == 0) {
+            return ['error' => Yii::t('jstw', 'Can not move root node as child!')];
+        }
         if (null === $oldParent = $class::findOne($oldParentId)) {
             return ['error' => Yii::t('jstw', "Old parent with id '{id}' not found!", ['id' => $oldParentId])];
         }
@@ -359,7 +360,7 @@ class NodeMoveAction extends Action
             $leftFrom = $this->parent->{$this->leftAttribute} + 1;
         } else {
             if (false === isset($siblings[$position - 1])) {
-                return ['error' => Yii::t('jstw', 'New previous sibling not exists')];
+                return ['error' => Yii::t('jstw', 'New previous sibling does not exist')];
             }
             $newPrevSiblingId = $siblings[$position - 1];
             $newPrevSiblingData = $this->getLr($newPrevSiblingId);

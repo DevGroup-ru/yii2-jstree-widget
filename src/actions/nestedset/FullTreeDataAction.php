@@ -108,6 +108,9 @@ class FullTreeDataAction extends Action
                         $res[] = [
                             'id' => $row['id'],
                             'text' => $row[$this->modelLabelAttribute],
+                            'a_attr' => [
+                                'data-id' => $row['id'],
+                            ],
                             'children' => self::prepareNestedData(
                                 $data,
                                 $row[$this->leftAttribute],
@@ -119,6 +122,9 @@ class FullTreeDataAction extends Action
                         $res[] = [
                             'id' => $row['id'],
                             'text' => $row[$this->modelLabelAttribute],
+                            'a_attr' => [
+                                'data-id' => $row['id'],
+                            ],
                             'children' => []
                         ];
                     }
@@ -127,6 +133,9 @@ class FullTreeDataAction extends Action
                     $res[] = [
                         'id' => $row['id'],
                         'text' => $row[$this->modelLabelAttribute],
+                        'a_attr' => [
+                            'data-id' => $row['id'],
+                        ],
                         'children' => self::prepareNestedData(
                             $data,
                             $row[$this->leftAttribute],

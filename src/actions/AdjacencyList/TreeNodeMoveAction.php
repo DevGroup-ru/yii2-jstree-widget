@@ -18,8 +18,8 @@ use yii\web\NotFoundHttpException;
  * {
  *     return [
  *         'move' => [
- *             'class' => TreeNodeMoveAction::className(),
- *             'class_name' => Category::className(),
+ *             'class' => TreeNodeMoveAction::class,
+ *             'class_name' => Category::class,
  *         ],
  *         ...
  *     ];

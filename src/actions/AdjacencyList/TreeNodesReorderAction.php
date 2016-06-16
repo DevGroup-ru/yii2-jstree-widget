@@ -18,8 +18,8 @@ use yii\web\BadRequestHttpException;
  * {
  *     return [
  *         'reorder' => [
- *             'class' => TreeNodesReorderAction::className(),
- *             'class_name' => Category::className(),
+ *             'class' => TreeNodesReorderAction::class,
+ *             'class_name' => Category::class,
  *         ],
  *         ...
  *     ];
