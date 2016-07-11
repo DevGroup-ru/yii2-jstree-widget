@@ -1,10 +1,12 @@
 <?php
 
-namespace devgroup\JsTreeWidget;
+namespace devgroup\JsTreeWidget\actions\AdjacencyList;
 
+use devgroup\TagDependencyHelper\ActiveRecordHelper;
 use Yii;
 use yii\base\Action;
 use yii\base\InvalidConfigException;
+use yii\caching\TagDependency;
 use yii\db\ActiveRecord;
 use yii\web\BadRequestHttpException;
 
@@ -16,15 +18,14 @@ use yii\web\BadRequestHttpException;
  * {
  *     return [
  *         'reorder' => [
- *             'class' => TreeNodesReorderAction::className(),
- *             'class_name' => Category::className(),
+ *             'class' => TreeNodesReorderAction::class,
+ *             'class_name' => Category::class,
  *         ],
  *         ...
  *     ];
  * }
  * ```
  */
-
 class TreeNodesReorderAction extends Action
 {
     public $className = null;
@@ -66,6 +67,10 @@ class TreeNodesReorderAction extends Action
             . $case
             . " WHERE `id` IN(" . implode(', ', array_keys($newSortOrders))
             . ")";
-        Yii::$app->db->createCommand($sql)->execute();
+        TagDependency::invalidate(
+            Yii::$app->cache,
+            ActiveRecordHelper::getCommonTag($class)
+        );
+        return 0 !== Yii::$app->db->createCommand($sql)->execute();
     }
 }

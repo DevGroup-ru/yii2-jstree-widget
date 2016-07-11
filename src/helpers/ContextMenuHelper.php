@@ -1,12 +1,11 @@
 <?php
 
-namespace devgroup\JsTreeWidget;
+namespace devgroup\JsTreeWidget\helpers;
 
 use Yii;
 use yii\helpers\Json;
 use yii\helpers\Url;
 use yii\web\JsExpression;
-
 
 class ContextMenuHelper
 {
@@ -61,4 +60,4 @@ class ContextMenuHelper
             }"
         );
     }
-} 
+}
