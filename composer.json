@@ -21,7 +21,8 @@
     "minimum-stability": "dev",
     "require": {
         "yiisoft/yii2": "*",
-        "bower-asset/jstree": "*"
+        "bower-asset/jstree": "*",
+        "devgroup/yii2-tag-dependency-helper": "~0.0.1"
     },
     "autoload": {
         "psr-4": {
