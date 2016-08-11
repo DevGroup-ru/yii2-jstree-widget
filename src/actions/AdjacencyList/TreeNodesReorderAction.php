@@ -2,7 +2,7 @@
 
 namespace devgroup\JsTreeWidget\actions\AdjacencyList;
 
-use devgroup\TagDependencyHelper\ActiveRecordHelper;
+use DevGroup\TagDependencyHelper\NamingHelper;
 use Yii;
 use yii\base\Action;
 use yii\base\InvalidConfigException;
@@ -69,7 +69,7 @@ class TreeNodesReorderAction extends Action
             . ")";
         TagDependency::invalidate(
             Yii::$app->cache,
-            ActiveRecordHelper::getCommonTag($class)
+            NamingHelper::getCommonTag($class)
         );
         return 0 !== Yii::$app->db->createCommand($sql)->execute();
     }

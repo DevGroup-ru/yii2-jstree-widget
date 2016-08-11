@@ -2,7 +2,7 @@
 
 namespace devgroup\JsTreeWidget\actions\AdjacencyList;
 
-use devgroup\TagDependencyHelper\ActiveRecordHelper;
+use DevGroup\TagDependencyHelper\NamingHelper;
 use Yii;
 use yii\base\Action;
 use yii\base\InvalidConfigException;
@@ -61,7 +61,7 @@ class TreeNodeMoveAction extends Action
         $model->{$this->modelParentIdField} = $parent->id;
         TagDependency::invalidate(
             Yii::$app->cache,
-            ActiveRecordHelper::getCommonTag($class)
+            NamingHelper::getCommonTag($class)
         );
         return $model->save(true, $this->saveAttributes);
     }

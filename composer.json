@@ -16,13 +16,17 @@
         {
             "name": "Pavel Fedotov",
             "email": "fps.06@mail.ru"
+        },
+        {
+          "name": "Pavel Naumov",
+          "email": "huggbies@email.su"
         }
     ],
     "minimum-stability": "dev",
     "require": {
         "yiisoft/yii2": "~2.0.0",
         "bower-asset/jstree": "*",
-        "devgroup/yii2-tag-dependency-helper": "~0.0.1"
+        "devgroup/yii2-tag-dependency-helper": "~1.4.0"
     },
     "autoload": {
         "psr-4": {

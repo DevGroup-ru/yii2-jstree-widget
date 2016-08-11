@@ -239,6 +239,7 @@ JS;
             $reorderJs = <<<JS
             jsTree_{$this->getId()}.on('move_node.jstree', function(e, data) {
                 var params = [];
+                var \$this = $(this);
                 $('.jstree-node').each(function(i, e) {
                     params[e.id] = i;
                 });

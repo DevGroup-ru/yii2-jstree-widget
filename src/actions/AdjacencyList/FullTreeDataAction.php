@@ -2,7 +2,7 @@
 
 namespace devgroup\JsTreeWidget\actions\AdjacencyList;
 
-use devgroup\TagDependencyHelper\ActiveRecordHelper;
+use DevGroup\TagDependencyHelper\NamingHelper;
 use Yii;
 use yii\base\Action;
 use yii\base\InvalidConfigException;
@@ -124,7 +124,7 @@ class FullTreeDataAction extends Action
                 86400,
                 new TagDependency([
                     'tags' => [
-                        ActiveRecordHelper::getCommonTag($class),
+                        NamingHelper::getCommonTag($class),
                     ],
                 ])
             );
