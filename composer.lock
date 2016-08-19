@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
         "This file is @generated automatically"
     ],
-    "hash": "7af1e39a89e67a0c92be67555a4faeb0",
+    "hash": "91dec5aa15975245c2b7286daa5b6acb",
     "content-hash": "91c83f95c43126f178464e2f95b8e56c",
     "packages": [
         {
@@ -90,12 +90,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/vakata/jstree.git",
-                "reference": "3b8f55d3797cd299eb36695b62d75c2313a3e3b3"
+                "reference": "bb0473ae8cfc205585b6404ef86f650df2f6996e"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/vakata/jstree/zipball/3b8f55d3797cd299eb36695b62d75c2313a3e3b3",
-                "reference": "3b8f55d3797cd299eb36695b62d75c2313a3e3b3",
+                "url": "https://api.github.com/repos/vakata/jstree/zipball/bb0473ae8cfc205585b6404ef86f650df2f6996e",
+                "reference": "bb0473ae8cfc205585b6404ef86f650df2f6996e",
                 "shasum": ""
             },
             "require": {
@@ -124,7 +124,7 @@
                     "README.md"
                 ],
                 "branch-alias": {
-                    "dev-master": "3.3.1-dev"
+                    "dev-master": "3.3.2-dev"
                 }
             },
             "keywords": [
@@ -361,12 +361,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/yiisoft/yii2-framework.git",
-                "reference": "e165d4bf1f7cf5eb44b8993a95eae08b406e19bd"
+                "reference": "3e56a83e49deacebec94cecb0ccd6d0977b20565"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/yiisoft/yii2-framework/zipball/e165d4bf1f7cf5eb44b8993a95eae08b406e19bd",
-                "reference": "e165d4bf1f7cf5eb44b8993a95eae08b406e19bd",
+                "url": "https://api.github.com/repos/yiisoft/yii2-framework/zipball/3e56a83e49deacebec94cecb0ccd6d0977b20565",
+                "reference": "3e56a83e49deacebec94cecb0ccd6d0977b20565",
                 "shasum": ""
             },
             "require": {
@@ -447,7 +447,7 @@
                 "framework",
                 "yii2"
             ],
-            "time": "2016-08-10 11:46:23"
+            "time": "2016-08-17 08:58:09"
         },
         {
             "name": "yiisoft/yii2-composer",

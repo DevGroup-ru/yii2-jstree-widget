@@ -69,7 +69,7 @@ class TreeWidget extends Widget
      * Translation category for Yii::t() which will be applied to labels.
      * If translation is not needed - use false.
      */
-    public $menuLabelsTranslationCategory = 'app';
+    public $menuLabelsTranslationCategory = false;
 
     /**
      * JsExpression for action(callback function) on double click. You can use JsExpression or make custom expression.
@@ -88,18 +88,24 @@ class TreeWidget extends Widget
     /** @var bool plugin config option for allow multiple nodes selections or not */
     public $multiSelect = false;
 
+    /** @var string Default labels translation category */
+    private $defaultTranslationCategory = 'jstw.defaults';
+
     /**
      * @inheritdoc
      */
     public function init()
     {
+        if (false === $this->menuLabelsTranslationCategory) {
+            $this->menuLabelsTranslationCategory = $this->defaultTranslationCategory;
+        }
         self::registerTranslations();
         parent::init();
     }
 
     public static function registerTranslations()
     {
-        Yii::$app->i18n->translations['jstw'] = [
+        Yii::$app->i18n->translations['jstw*'] = [
             'class' => 'yii\i18n\PhpMessageSource',
             'basePath' => dirname(__DIR__) . DIRECTORY_SEPARATOR . 'messages',
         ];
@@ -180,9 +186,7 @@ class TreeWidget extends Widget
 
             $options['contextmenu']['items'] = [];
             foreach ($this->contextMenuItems as $index => $item) {
-                if ($this->menuLabelsTranslationCategory !== false) {
-                    $item['label'] = Yii::t($this->menuLabelsTranslationCategory, $item['label']);
-                }
+                $item['label'] = Yii::t($this->menuLabelsTranslationCategory, $item['label']);
                 $options['contextmenu']['items'][$index] = $item;
             }
         }
