@@ -136,6 +136,11 @@ class TreeWidget extends Widget
                             return { 'id' : node.id };
                         }"
                     ),
+                    'data' => new JsExpression(
+                        "function (node) {
+                        return { 'id' : node.id };
+                        }"
+                    ),
                     'error' => new JsExpression(
                         "function ( o, textStatus, errorThrown ) {
                             alert(o.responseText);
