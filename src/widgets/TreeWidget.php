@@ -252,9 +252,11 @@ JS;
                 $('.jstree-node').each(function(i, e) {
                     params[e.id] = i;
                 });
-                $.post('$reorderUrl',
-                    {'order':params }
-                    , "json")
+                $.post('$reorderUrl', {
+                    'order':params,
+                    'id': data.node.id
+                     },
+                      "json")
                     .done(function (data) {
                         if ('undefined' !== typeof(data.error)) {
                             alert(data.error);
