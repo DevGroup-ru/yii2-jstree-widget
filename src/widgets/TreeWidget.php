@@ -150,14 +150,18 @@ class TreeWidget extends Widget
             ]
         ];
 
-        // merge with contextmenu configuration
-        $options = ArrayHelper::merge($options, $this->contextMenuOptions());
-
         // merge with attribute-provided options
         $options = ArrayHelper::merge($options, $this->options);
-
+        if (false === empty($this->contextMenuItems)) {
+            if (!in_array('contextmenu', $this->plugins)) {
+                // add missing contextmenu plugin
+                $options['plugins'] = ['contextmenu'];
+            }
+            $functionName = $this->getId() . 'ContextMenu';
+            $options['contextmenu'] = ['items' => new JsExpression($functionName)];
+            $this->contextMenuOptions($functionName);
+        }
         $options = Json::encode($options);
-
         $this->getView()->registerAssetBundle('devgroup\JsTreeWidget\widgets\JsTreeAssetBundle');
 
         $doubleClick = '';
@@ -178,24 +182,46 @@ class TreeWidget extends Widget
     }
 
     /**
+     * @param $functionName
      * @return array
      */
-    private function contextMenuOptions()
+    private function contextMenuOptions($functionName)
     {
-        $options = [];
-        if (count($this->contextMenuItems) > 0) {
-            if (!in_array('contextmenu', $this->plugins)) {
-                // add missing contextmenu plugin
-                $options['plugins'] = ['contextmenu'];
-            }
-
-            $options['contextmenu']['items'] = [];
-            foreach ($this->contextMenuItems as $index => $item) {
-                $item['label'] = Yii::t($this->menuLabelsTranslationCategory, $item['label']);
-                $options['contextmenu']['items'][$index] = $item;
+        $items = [];
+        $conditionItems = "";
+        foreach ($this->contextMenuItems as $index => $item) {
+            $item['label'] = Yii::t($this->menuLabelsTranslationCategory, $item['label']);
+            if (false === empty($item['showWhen'])) {
+                if (true === is_array($item['showWhen'])) {
+                    $condition = [];
+                    foreach ($item['showWhen'] as $key => $value) {
+                        $key = (false !== strpos($key, 'data-')) ? $key : 'data-' . $key;
+                        $condition[] = "node.hasOwnProperty('a_attr') && node.a_attr['$key'] == {$value}";
+                    }
+                    $condition = implode(' && ', $condition);
+                } else {
+                    $condition = $item['showWhen'];
+                }
+                unset($item['showWhen']);
+                $item = Json::encode($item);
+                $conditionItems .= new JsExpression("
+                if ({$condition}) {
+                    items.{$index} = $item;
+                }
+                ");
+            } else {
+                $items[$index] = $item;
             }
         }
-        return $options;
+        $items = Json::encode($items);
+        $js = <<<JS
+            function $functionName(node) {
+                var items = $items;
+                $conditionItems
+                return items;
+            }
+JS;
+        $this->view->registerJs($js, View::POS_HEAD);
     }
 
     /**

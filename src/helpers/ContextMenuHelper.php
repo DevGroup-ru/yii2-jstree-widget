@@ -46,18 +46,18 @@ class ContextMenuHelper
             $dataExpression .= "
             for (var attributeName in data) {
                 dataVariables.push(encodeURIComponent(attributeName) + '=' + encodeURIComponent(data[attributeName]));
-            };\n";
+            }\n";
         } else {
             $dataExpression = "var dataVariables = '';";
         }
         $dataExpression .= "dataVariables=dataVariables.join('&'); ";
-        return new JsExpression(
-            "function(node) {
+        return new JsExpression("
+            function(node) {
                 var \$object = node.reference ? \$(node.reference[0]) : node;
                 $dataExpression
                 document.location = $baseUrl + '$union' + dataVariables;
                 return false;
-            }"
-        );
+            }
+            ");
     }
 }
