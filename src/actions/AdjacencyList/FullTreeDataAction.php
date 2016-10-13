@@ -7,6 +7,7 @@ use Yii;
 use yii\base\Action;
 use yii\base\InvalidConfigException;
 use yii\caching\TagDependency;
+use yii\helpers\ArrayHelper;
 use yii\web\Response;
 
 /**
@@ -20,7 +21,7 @@ use yii\web\Response;
  *         'getTree' => [
  *             'class' => AdjacencyFullTreeDataAction::class,
  *             'className' => Category::class,
- *             'modelLabelAttribute' => 'name',
+ *             'modelLabelAttribute' => 'defaultTranslation.name',
  *
  *         ],
  *     ...
@@ -104,7 +105,7 @@ class FullTreeDataAction extends Action
                 $item = [
                     'id' => $row[$this->modelIdAttribute],
                     'parent' => ($row[$this->modelParentAttribute] > 0) ? $row[$this->modelParentAttribute] : '#',
-                    'text' => $row[$this->modelLabelAttribute],
+                    'text' => ArrayHelper::getValue($row, $this->modelLabelAttribute, 'item'),
                     'a_attr' => [
                         'data-id' => $row[$this->modelIdAttribute],
                         'data-parent_id' => $row[$this->modelParentAttribute]
