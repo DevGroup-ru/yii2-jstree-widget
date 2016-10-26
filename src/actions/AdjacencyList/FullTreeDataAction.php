@@ -102,9 +102,10 @@ class FullTreeDataAction extends Action
             $result = [];
 
             foreach ($rows as $row) {
+                $parent = ArrayHelper::getValue($row, $this->modelParentAttribute, 0);
                 $item = [
-                    'id' => $row[$this->modelIdAttribute],
-                    'parent' => ($row[$this->modelParentAttribute] > 0) ? $row[$this->modelParentAttribute] : '#',
+                    'id' => ArrayHelper::getValue($row, $this->modelIdAttribute, 0),
+                    'parent' => ($parent) ? $parent : '#',
                     'text' => ArrayHelper::getValue($row, $this->modelLabelAttribute, 'item'),
                     'a_attr' => [
                         'data-id' => $row[$this->modelIdAttribute],
