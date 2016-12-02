@@ -26,7 +26,7 @@
     "require": {
         "yiisoft/yii2": "~2.0.0",
         "bower-asset/jstree": "*",
-        "devgroup/yii2-tag-dependency-helper": "~1.4.0"
+        "devgroup/yii2-tag-dependency-helper": "~1.5"
     },
     "autoload": {
         "psr-4": {
