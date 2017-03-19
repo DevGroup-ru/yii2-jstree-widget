@@ -53,21 +53,31 @@ js;
 
 if ($multiple === false) {
     $js .= <<<js
+  var selectNode = function(node) {
+    var path = '';
+    var anchor = node.find('>.jstree-anchor');
+    node.parents('.jstree-node').find('>.jstree-anchor').each(function () {
+      var name = $(this).text();
+      path = path + (path === '' ? '' : ' > ') + name;
+    });
+    path = path + (path === '' ? '' : ' > ') + anchor.text();
+    selected.empty().append(path);
+    $('#{$id}').val(anchor.data('id'));
+  }
   $('#{$id}__tree')
     .bind("dblclick.jstree", function (event) {
-      const node = $(event.target).closest("li");
-      let path = '';
-      window.DAT_node = node;
-      node.parents('.jstree-node').find('>.jstree-anchor').each(function () {
-        const name = $(this).text();
-        //! @todo Add ids combining into hidden field here
-        path = path + (path === '' ? '' : ' > ') + name;
-      });
-      path += ' > ' + node.find('>.jstree-anchor').text();
-      selected.empty().append(path);
-      $('#{$id}').val(node.find('>.jstree-anchor').data('id'));
+      var node = $(event.target).closest("li");
+      selectNode(node);      
       selectButton.click();
     });
+  const selectedVal = parseInt($('#{$id}').val());
+  if (selectedVal > 0) {
+    $('#{$id}__tree').on('ready.jstree', function(e, data) {
+      var node = data.instance.get_node(selectedVal, true).closest('li');
+      selectNode(node);
+     
+    });
+  }
 js;
 
 }
