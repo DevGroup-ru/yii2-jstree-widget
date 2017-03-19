@@ -1,0 +1,26 @@
+.tree-input {
+  position: relative;
+}
+.tree-input__tree-container {
+  position: absolute;
+  background: #fff;
+  border: 1px solid #ddd;
+  width: 100%;
+  height: 50vh;
+  overflow: auto;
+  display: none;
+  box-shadow: 0 0 10px 1px rgba(0,0,0,0.3);
+  z-index: 1;
+}
+.jstree-contextmenu {
+  z-index: 2;
+}
+.tree-input__tree-notice {
+  background: #eee;
+  border: 1px solid #00a7d0;
+  padding: 4px;
+}
+
+.tree-input__tree-container_active {
+  display: block;
+}
