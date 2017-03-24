@@ -24,3 +24,7 @@
 .tree-input__tree-container_active {
   display: block;
 }
+.tree-input__selected-values {
+  line-height: 1.44;
+  padding: 6px 12px;
+}
