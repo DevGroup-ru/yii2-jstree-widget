@@ -26,7 +26,7 @@ TreeInputAssetBundle::register($this);
         <div class="clearfix"></div>
     </div>
     <div class="tree-input__tree-container">
-        <?php if ($multiple === 'false'): ?>
+        <?php if ($multiple === false): ?>
         <div class="tree-input__tree-notice text-info">
             <i class="fa fa-info-circle"></i>
             <?= Yii::t('jstw', 'Double click needed tree node to select it') ?>
@@ -35,6 +35,14 @@ TreeInputAssetBundle::register($this);
         <?=
         TreeWidget::widget($treeConfig)
         ?>
+        <?php if ($multiple): ?>
+        <div class="tree-input__tree-footer">
+            <a href="#" class="btn btn-primary tree-input__select">
+                <i class="fa fa-fw fa-check"></i>
+                <?= Yii::t('jstw', 'OK') ?>
+            </a>
+        </div>
+        <?php endif;?>
     </div>
 </div>
 <?php
@@ -49,10 +57,10 @@ $js = <<<js
     buttonArrow.toggleClass('fa-angle-down');
     return false;
   });
-js;
-
-if ($multiple === false) {
-    $js .= <<<js
+  var emptySelected = function() {
+    selected.empty()
+    $('#{$id}').val('');
+  };
   var selectNode = function(node) {
     var path = '';
     var anchor = node.find('>.jstree-anchor');
@@ -61,9 +69,16 @@ if ($multiple === false) {
       path = path + (path === '' ? '' : ' > ') + name;
     });
     path = path + (path === '' ? '' : ' > ') + anchor.text();
-    selected.empty().append(path);
-    $('#{$id}').val(anchor.data('id'));
-  }
+    selected.append('<div class="tree-input__selected-value">' + path + '</div>');
+    const val = $('#{$id}').val();
+    const selectedNow = val.length > 0 ? val.split(',') : [];
+    selectedNow.push(anchor.data('id'));
+    $('#{$id}').val(selectedNow.join(','));
+  };
+js;
+
+if ($multiple === false) {
+    $js .= <<<js
   $('#{$id}__tree')
     .bind("dblclick.jstree", function (event) {
       var node = $(event.target).closest("li");
@@ -74,12 +89,42 @@ if ($multiple === false) {
   if (selectedVal > 0) {
     $('#{$id}__tree').on('ready.jstree', function(e, data) {
       var node = data.instance.get_node(selectedVal, true).closest('li');
+      emptySelected();
       selectNode(node);
      
     });
   }
 js;
+} else {
+    $js .= <<<js
+    const selectedValues = $('#{$id}').val().split(',');
+    $('#{$id}__tree').on('ready.jstree', function(e, data) {
+      emptySelected();
+      selectedValues.forEach(function(value) {
+        var selectedVal = parseInt(value);
+        var node = data.instance.get_node(selectedVal, true).closest('li');
+        selectNode(node);      
+      });
+    });
+    treeContainer.find('.tree-input__select').click(function() {
+      emptySelected(); 
+      $("#{$id}__tree").jstree("get_checked",null,true).forEach(function (id) { 
+        var selectedVal = parseInt(id);
+        if (selectedVal > 0) {
+            var node = $("#{$id}__tree").jstree('get_node', selectedVal, true).closest('li');
+            selectNode(node);
+        }
+      });
+      selectButton.click();
+      return false;
+    });
+js;
 
 }
+
+$js .= <<<js
+
+js;
+
 
 $this->registerJs($js);

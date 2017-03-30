@@ -29,11 +29,18 @@ class TreeInput extends InputWidget
         $id = 'input_tree__' . $this->getId();
         $this->options['id'] = $id;
 
+
         if ($this->hasModel()) {
             $input = Html::activeHiddenInput($this->model, $this->attribute, $this->options);
+            $value = $this->model->{$this->attribute};
         } else {
             $input = Html::hiddenInput($this->name, $this->value, $this->options);
+            $value = $this->value;
         }
+        if (is_array($value)) {
+            $value = implode(',', $value);
+        }
+        $this->treeConfig['selectedNodes'] = $value;
 
         $this->treeConfig['id'] = $id . '__tree';
         $oldOptions = isset($this->treeConfig['options']) ? $this->treeConfig['options'] : [];
@@ -43,6 +50,16 @@ class TreeInput extends InputWidget
                 'dblclick_toggle' => false,
             ],
         ]);
+        $this->treeConfig['plugins'] = [
+            'wholerow',
+            'contextmenu',
+            'dnd',
+            'types',
+        ];
+
+        if ($this->multiple) {
+            $this->treeConfig['plugins'][] = 'checkbox';
+        }
 
         return $this->render(
             'tree-input',

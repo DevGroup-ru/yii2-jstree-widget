@@ -30,6 +30,7 @@ class FullTreeDataAction extends Action
     /** @var  string */
     private $tableName;
 
+    private $selectedNodes = [];
     /**
      * @inheritdoc
      */
@@ -84,6 +85,9 @@ class FullTreeDataAction extends Action
             ->select($selectArray)
             ->orderBy($orderBy)
             ->all();
+
+        $this->selectedNodes = explode(',', Yii::$app->request->get('selected', ''));
+
         return $this->prepareNestedData($data);
     }
 
@@ -117,6 +121,9 @@ class FullTreeDataAction extends Action
                                 $row[$this->rightAttribute],
                                 $currentRoot
                             ),
+                            'state' => [
+                                'selected' => in_array($row['id'], $this->selectedNodes),
+                            ],
                         ];
                     } else {
                         $res[] = [
@@ -125,7 +132,10 @@ class FullTreeDataAction extends Action
                             'a_attr' => [
                                 'data-id' => $row['id'],
                             ],
-                            'children' => []
+                            'children' => [],
+                            'state' => [
+                                'selected' => in_array($row['id'], $this->selectedNodes),
+                            ],
                         ];
                     }
                     $lft = $row[$this->rightAttribute];
@@ -142,6 +152,9 @@ class FullTreeDataAction extends Action
                             $row[$this->rightAttribute],
                             $currentRoot
                         ),
+                        'state' => [
+                            'selected' => in_array($row['id'], $this->selectedNodes),
+                        ],
                     ];
                 }
             }

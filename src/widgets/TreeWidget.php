@@ -91,6 +91,9 @@ class TreeWidget extends Widget
     /** @var string Default labels translation category */
     private $defaultTranslationCategory = 'jstw.defaults';
 
+    /** @var array selected nodes */
+    public $selectedNodes = [];
+
     /**
      * @inheritdoc
      */
@@ -118,6 +121,10 @@ class TreeWidget extends Widget
     {
         if (!is_array($this->treeDataRoute)) {
             throw new InvalidConfigException("Attribute treeDataRoute is required to use TreeWidget.");
+        }
+
+        if (count($this->selectedNodes) > 0) {
+            $this->treeDataRoute['selected'] = $this->selectedNodes;
         }
 
         $options = [
