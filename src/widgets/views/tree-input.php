@@ -75,7 +75,7 @@ $js = <<<js
       to = setTimeout(function () {
         var v = search.val();
         jstree.jstree(true).search(v);
-      }, 250);      
+      }, 1000);      
     });
     
     treeContainer.find('.tree-input__search-clear').click(function(){
@@ -180,4 +180,12 @@ $js .= <<<js
 js;
 
 
-$this->registerJs($js);
+$this->registerJs(
+    <<<js
+(function(){
+$js
+})();
+
+js
+
+);

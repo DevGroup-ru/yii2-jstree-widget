@@ -35,7 +35,7 @@ class TreeInput extends InputWidget
 
         if ($this->hasModel()) {
             $input = Html::activeHiddenInput($this->model, $this->attribute, $this->options);
-            $value = $this->model->{$this->attribute};
+            $value = Html::getAttributeValue($this->model, $this->attribute);
         } else {
             $input = Html::hiddenInput($this->name, $this->value, $this->options);
             $value = $this->value;

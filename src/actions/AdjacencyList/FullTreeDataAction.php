@@ -8,6 +8,7 @@ use yii\base\Action;
 use yii\base\InvalidConfigException;
 use yii\caching\TagDependency;
 use yii\helpers\ArrayHelper;
+use yii\helpers\FileHelper;
 use yii\web\Response;
 
 /**
@@ -49,13 +50,13 @@ class FullTreeDataAction extends Action
     public $querySelectedAttribute = 'selected_id';
     /**
      * Additional conditions for retrieving tree(ie. don't display nodes marked as deleted)
-     * @var array
+     * @var array|\Closure
      */
     public $whereCondition = [];
 
     /**
      * Cache key prefix. Should be unique if you have multiple actions with different $whereCondition
-     * @var string
+     * @var string|\Closure
      */
     public $cacheKey = 'FullTree';
 
@@ -64,6 +65,11 @@ class FullTreeDataAction extends Action
      * @var int
      */
     public $cacheLifeTime = 86400;
+
+    /**
+     * @var bool|int If int - means cache life time for plain json cache files, false
+     */
+    public $cacheJson = false;
 
     public function init()
     {
@@ -79,20 +85,38 @@ class FullTreeDataAction extends Action
     {
         Yii::$app->response->format = Response::FORMAT_JSON;
 
+        /** @var \yii\db\ActiveRecord $class */
         $class = $this->className;
 
         if (null === $current_selected_id = Yii::$app->request->get($this->querySelectedAttribute)) {
             $current_selected_id = Yii::$app->request->get($this->queryParentAttribute);
         }
+        $cacheKey = $this->cacheKey instanceof \Closure ? call_user_func($this->cacheKey) : $this->cacheKey;
+        $cacheKey = "AdjacencyFullTreeData:{$cacheKey}:{$class}:{$this->querySortOrder}";
 
-        $cacheKey = "AdjacencyFullTreeData:{$this->cacheKey}:{$class}:{$this->querySortOrder}";
+        $filename = '';
+        if ($this->cacheJson) {
+            $cacheKey = md5($cacheKey);
+            $filename = Yii::getAlias("@runtime/tree-cache/$cacheKey.json");
+            if (file_exists($filename) && (time() - filemtime($filename) < $this->cacheJson)) {
+                Yii::$app->response->format = Response::FORMAT_RAW;
+                header('Content-Type: application/json');
 
+                return file_get_contents($filename);
+            }
+        }
+
+
+        Yii::beginProfile('Get tree');
         if (false === $result = Yii::$app->cache->get($cacheKey)) {
+            Yii::beginProfile('Build tree');
             $query = $class::find()
                 ->orderBy([$this->querySortOrder => SORT_ASC]);
 
-            if (count($this->whereCondition) > 0) {
-                $query = $query->where($this->whereCondition);
+            if ($this->whereCondition instanceof \Closure) {
+                $query->where(call_user_func($this->whereCondition));
+            } elseif (count($this->whereCondition) > 0) {
+                $query->where($this->whereCondition);
             }
 
             if (null === $rows = $query->asArray()->all()) {
@@ -120,6 +144,16 @@ class FullTreeDataAction extends Action
                 $result[$row[$this->modelIdAttribute]] = $item;
             }
 
+            if ($this->cacheJson) {
+                $encoded = json_encode(array_values($result));
+                FileHelper::createDirectory(basename($filename));
+
+                file_put_contents($filename, $encoded);
+
+                Yii::$app->response->format = Response::FORMAT_RAW;
+                header('Content-Type: application/json');
+                return $encoded;
+            }
             Yii::$app->cache->set(
                 $cacheKey,
                 $result,
@@ -130,6 +164,8 @@ class FullTreeDataAction extends Action
                     ],
                 ])
             );
+
+            Yii::endProfile('Build tree');
         }
 
         if (array_key_exists($current_selected_id, $result)) {
@@ -138,7 +174,11 @@ class FullTreeDataAction extends Action
                 ['state' => ['opened' => true, 'selected' => true]]
             );
         }
+        Yii::endProfile('Get tree');
 
+        header('Content-Type: application/json');
+        echo json_encode(array_values($result));
+        Yii::$app->end();
         return array_values($result);
     }
 }
