@@ -9,6 +9,7 @@ use devgroup\JsTreeWidget\widgets\TreeWidget;
  * @var string $selectIcon
  * @var string $selectText
  * @var bool   $multiple
+ * @var bool   $clickToOpen
  * @var array  $treeConfig
  */
 
@@ -16,6 +17,7 @@ TreeInputAssetBundle::register($this);
 ?>
 <div class="tree-input">
     <?= $input ?>
+    <?php if ($clickToOpen): ?>
     <div class="tree-input__selected">
         <a href="#" class="btn btn-primary tree-input__button pull-right">
             <i class="fa-fw <?= $selectIcon ?>"></i>
@@ -25,8 +27,9 @@ TreeInputAssetBundle::register($this);
         <div class="tree-input__selected-values"></div>
         <div class="clearfix"></div>
     </div>
-    <div class="tree-input__tree-container">
-        <?php if ($multiple === false): ?>
+    <?php endif; ?>
+    <div class="tree-input__tree-container <?= $clickToOpen === false ? 'tree-input__tree-container_opened_always' : '' ?>">
+        <?php if ($multiple === false && $clickToOpen): ?>
         <div class="tree-input__tree-notice text-info">
             <i class="fa fa-info-circle"></i>
             <?= Yii::t('jstw', 'Double click needed tree node to select it') ?>
@@ -35,7 +38,7 @@ TreeInputAssetBundle::register($this);
         <?=
         TreeWidget::widget($treeConfig)
         ?>
-        <?php if ($multiple): ?>
+        <?php if ($multiple && $clickToOpen): ?>
         <div class="tree-input__tree-footer">
             <a href="#" class="btn btn-primary tree-input__select">
                 <i class="fa fa-fw fa-check"></i>
@@ -46,78 +49,102 @@ TreeInputAssetBundle::register($this);
     </div>
 </div>
 <?php
+$clickToOpenJson = $clickToOpen ? 'true' : 'false';
 $js = <<<js
+  $('#{$id}__tree').jstree('open_all');
   var treeInput = $('#{$id}').parent();
+  var jstree = $('#{$id}__tree');
   var treeContainer = treeInput.find('.tree-input__tree-container');
-  var buttonArrow = treeInput.find('.tree-input__arrow');
-  var selectButton = treeInput.find('.tree-input__button');
-  var selected = treeInput.find('.tree-input__selected-values');
-  selectButton.click(function() {
-    treeContainer.toggleClass('tree-input__tree-container_active'); 
-    buttonArrow.toggleClass('fa-angle-down');
-    return false;
-  });
+  var clickToOpen = $clickToOpenJson;
+  if (clickToOpen) {
+      var buttonArrow = treeInput.find('.tree-input__arrow');
+      var selectButton = treeInput.find('.tree-input__button');
+      var selected = treeInput.find('.tree-input__selected-values');
+      selectButton.click(function() {
+        treeContainer.toggleClass('tree-input__tree-container_active'); 
+        buttonArrow.toggleClass('fa-angle-down');
+        return false;
+      });
+  }
   var emptySelected = function() {
-    selected.empty()
+    if (clickToOpen) {
+      selected.empty()
+    }
     $('#{$id}').val('');
   };
   var selectNode = function(node) {
-    var path = '';
-    var anchor = node.find('>.jstree-anchor');
-    node.parents('.jstree-node').find('>.jstree-anchor').each(function () {
-      var name = $(this).text();
-      path = path + (path === '' ? '' : ' > ') + name;
-    });
-    path = path + (path === '' ? '' : ' > ') + anchor.text();
-    selected.append('<div class="tree-input__selected-value">' + path + '</div>');
+    if (clickToOpen) {
+        var path = jstree.jstree('get_path', node, ' > ');
+        selected.append('<div class="tree-input__selected-value">' + path + '</div>');
+    }
+    
     const val = $('#{$id}').val();
     const selectedNow = val.length > 0 ? val.split(',') : [];
-    selectedNow.push(anchor.data('id'));
+    selectedNow.push(node);
     $('#{$id}').val(selectedNow.join(','));
   };
 js;
 
 if ($multiple === false) {
     $js .= <<<js
-  $('#{$id}__tree')
-    .bind("dblclick.jstree", function (event) {
-      var node = $(event.target).closest("li");
-      selectNode(node);      
-      selectButton.click();
-    });
+  if (clickToOpen) {
+      $('#{$id}__tree')
+        .on("dblclick.jstree", function (event) {
+          var node = $(event.target).closest('.jstree-anchor').data("id");
+          emptySelected();
+          selectNode(node);      
+          selectButton.click();
+        });
+  } else {
+      $('#{$id}__tree')
+        .on('select_node.jstree', function(event, data) {
+          emptySelected();
+          selectNode(data.node.id);
+        });
+  }
   const selectedVal = parseInt($('#{$id}').val());
   if (selectedVal > 0) {
     $('#{$id}__tree').on('ready.jstree', function(e, data) {
-      var node = data.instance.get_node(selectedVal, true).closest('li');
       emptySelected();
-      selectNode(node);
+      selectNode(selectedVal);
      
     });
   }
 js;
 } else {
     $js .= <<<js
-    const selectedValues = $('#{$id}').val().split(',');
+    var selectedValues = $('#{$id}').val().split(',');
     $('#{$id}__tree').on('ready.jstree', function(e, data) {
       emptySelected();
       selectedValues.forEach(function(value) {
         var selectedVal = parseInt(value);
-        var node = data.instance.get_node(selectedVal, true).closest('li');
-        selectNode(node);      
+        
+        selectNode(selectedVal);     
+        
       });
     });
-    treeContainer.find('.tree-input__select').click(function() {
+    var applySelected = function() {
       emptySelected(); 
       $("#{$id}__tree").jstree("get_checked",null,true).forEach(function (id) { 
         var selectedVal = parseInt(id);
-        if (selectedVal > 0) {
-            var node = $("#{$id}__tree").jstree('get_node', selectedVal, true).closest('li');
-            selectNode(node);
-        }
+        selectNode(selectedVal);
+        
       });
-      selectButton.click();
-      return false;
-    });
+      if (clickToOpen) {
+        selectButton.click();
+      }
+    };
+    if (clickToOpen) {
+        treeContainer.find('.tree-input__select').click(function() {
+          applySelected();      
+          return false;
+        });
+    } else {
+      $('#{$id}__tree')
+        .on('changed.jstree', function() {
+          applySelected();
+        });
+    }
 js;
 
 }

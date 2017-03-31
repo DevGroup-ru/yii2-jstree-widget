@@ -21,8 +21,11 @@
   padding: 4px;
 }
 
-.tree-input__tree-container_active {
+.tree-input__tree-container_active, .tree-input__tree-container_opened_always {
   display: block;
+}
+.tree-input__tree-container_opened_always {
+  position: relative;
 }
 .tree-input__selected-values {
   line-height: 1.44;

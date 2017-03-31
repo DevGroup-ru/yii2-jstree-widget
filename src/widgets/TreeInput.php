@@ -16,6 +16,8 @@ class TreeInput extends InputWidget
     public $selectIcon = 'fa fa-folder-o';
     public $selectText;
 
+    public $clickToOpen = true;
+
     public function init()
     {
         parent::init();
@@ -59,6 +61,7 @@ class TreeInput extends InputWidget
 
         if ($this->multiple) {
             $this->treeConfig['plugins'][] = 'checkbox';
+
         }
 
         return $this->render(
@@ -70,6 +73,7 @@ class TreeInput extends InputWidget
                 'selectIcon' => $this->selectIcon,
                 'selectText' => $this->selectText,
                 'input' => $input,
+                'clickToOpen' => $this->clickToOpen,
             ]
         );
     }
