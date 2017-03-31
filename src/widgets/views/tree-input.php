@@ -102,7 +102,7 @@ if ($multiple === false) {
           selectNode(data.node.id);
         });
   }
-  const selectedVal = parseInt($('#{$id}').val());
+  const selectedVal = $('#{$id}').val();
   if (selectedVal > 0) {
     $('#{$id}__tree').on('ready.jstree', function(e, data) {
       emptySelected();
@@ -117,17 +117,14 @@ js;
     $('#{$id}__tree').on('ready.jstree', function(e, data) {
       emptySelected();
       selectedValues.forEach(function(value) {
-        var selectedVal = parseInt(value);
-        
-        selectNode(selectedVal);     
+        selectNode(value);     
         
       });
     });
     var applySelected = function() {
       emptySelected(); 
       $("#{$id}__tree").jstree("get_checked",null,true).forEach(function (id) { 
-        var selectedVal = parseInt(id);
-        selectNode(selectedVal);
+        selectNode(id);
         
       });
       if (clickToOpen) {
