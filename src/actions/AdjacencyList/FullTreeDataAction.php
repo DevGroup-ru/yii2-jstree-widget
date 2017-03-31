@@ -66,10 +66,7 @@ class FullTreeDataAction extends Action
      */
     public $cacheLifeTime = 86400;
 
-    /**
-     * @var bool|int If int - means cache life time for plain json cache files, false
-     */
-    public $cacheJson = false;
+    private $selectedNodes = [];
 
     public function init()
     {
@@ -93,19 +90,6 @@ class FullTreeDataAction extends Action
         }
         $cacheKey = $this->cacheKey instanceof \Closure ? call_user_func($this->cacheKey) : $this->cacheKey;
         $cacheKey = "AdjacencyFullTreeData:{$cacheKey}:{$class}:{$this->querySortOrder}";
-
-        $filename = '';
-        if ($this->cacheJson) {
-            $cacheKey = md5($cacheKey);
-            $filename = Yii::getAlias("@runtime/tree-cache/$cacheKey.json");
-            if (file_exists($filename) && (time() - filemtime($filename) < $this->cacheJson)) {
-                Yii::$app->response->format = Response::FORMAT_RAW;
-                header('Content-Type: application/json');
-
-                return file_get_contents($filename);
-            }
-        }
-
 
         Yii::beginProfile('Get tree');
         if (false === $result = Yii::$app->cache->get($cacheKey)) {
@@ -144,16 +128,6 @@ class FullTreeDataAction extends Action
                 $result[$row[$this->modelIdAttribute]] = $item;
             }
 
-            if ($this->cacheJson) {
-                $encoded = json_encode(array_values($result));
-                FileHelper::createDirectory(basename($filename));
-
-                file_put_contents($filename, $encoded);
-
-                Yii::$app->response->format = Response::FORMAT_RAW;
-                header('Content-Type: application/json');
-                return $encoded;
-            }
             Yii::$app->cache->set(
                 $cacheKey,
                 $result,
@@ -174,11 +148,20 @@ class FullTreeDataAction extends Action
                 ['state' => ['opened' => true, 'selected' => true]]
             );
         }
+        $this->selectedNodes = explode(',', Yii::$app->request->get('selected', ''));
+        foreach ($this->selectedNodes as $node) {
+            if ($node !== '') {
+                if (array_key_exists($node, $result)) {
+                    $result[$node]['state'] = [
+                        'selected' => true,
+                    ];
+                }
+            }
+        }
         Yii::endProfile('Get tree');
 
+        Yii::$app->response->format = Response::FORMAT_RAW;
         header('Content-Type: application/json');
-        echo json_encode(array_values($result));
-        Yii::$app->end();
-        return array_values($result);
+        return json_encode(array_values($result));
     }
 }
