@@ -2,6 +2,7 @@
 /** @var yii\web\View $this  */
 use devgroup\JsTreeWidget\widgets\TreeInputAssetBundle;
 use devgroup\JsTreeWidget\widgets\TreeWidget;
+use yii\helpers\Html;
 
 /**
  * @var string $input
@@ -9,6 +10,7 @@ use devgroup\JsTreeWidget\widgets\TreeWidget;
  * @var string $selectIcon
  * @var string $selectText
  * @var bool   $multiple
+ * @var bool   $search
  * @var bool   $clickToOpen
  * @var array  $treeConfig
  */
@@ -35,6 +37,17 @@ TreeInputAssetBundle::register($this);
             <?= Yii::t('jstw', 'Double click needed tree node to select it') ?>
         </div>
         <?php endif;?>
+
+        <?php if ($search): ?>
+            <div class="input-group">
+                <input type="text" class="form-control tree-input__search" placeholder="<?= Html::encode(Yii::t('jstw', 'Type to search'))?>">
+                <a href="#" class="btn btn-default input-group-addon tree-input__search-clear">
+                    <i class="fa fa-times fa-fw"></i>
+                    <?= Yii::t('jstw', 'Clear') ?>
+                </a>
+            </div>
+        <?php endif; ?>
+
         <?=
         TreeWidget::widget($treeConfig)
         ?>
@@ -51,10 +64,26 @@ TreeInputAssetBundle::register($this);
 <?php
 $clickToOpenJson = $clickToOpen ? 'true' : 'false';
 $js = <<<js
-  $('#{$id}__tree').jstree('open_all');
   var treeInput = $('#{$id}').parent();
   var jstree = $('#{$id}__tree');
   var treeContainer = treeInput.find('.tree-input__tree-container');
+  var search = treeContainer.find('.tree-input__search');
+  if (search.length) {
+    var to = false;
+    search.keyup(function() {
+      if(to) { clearTimeout(to); }
+      to = setTimeout(function () {
+        var v = search.val();
+        jstree.jstree(true).search(v);
+      }, 250);      
+    });
+    
+    treeContainer.find('.tree-input__search-clear').click(function(){
+      search.val('');
+      jstree.jstree('clear_search');
+      return false;
+    });
+  }
   var clickToOpen = $clickToOpenJson;
   if (clickToOpen) {
       var buttonArrow = treeInput.find('.tree-input__arrow');

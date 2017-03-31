@@ -17,6 +17,7 @@ class TreeInput extends InputWidget
     public $selectText;
 
     public $clickToOpen = true;
+    public $search = false;
 
     public function init()
     {
@@ -61,7 +62,12 @@ class TreeInput extends InputWidget
 
         if ($this->multiple) {
             $this->treeConfig['plugins'][] = 'checkbox';
-
+        }
+        if ($this->search) {
+            $this->treeConfig['plugins'][] = 'search';
+            $this->treeConfig['options']['search'] = [
+                'show_only_matches' => true,
+            ];
         }
 
         return $this->render(
@@ -74,6 +80,7 @@ class TreeInput extends InputWidget
                 'selectText' => $this->selectText,
                 'input' => $input,
                 'clickToOpen' => $this->clickToOpen,
+                'search' => $this->search,
             ]
         );
     }
