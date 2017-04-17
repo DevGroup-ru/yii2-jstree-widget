@@ -165,7 +165,7 @@ class TreeWidget extends Widget
                 $options['plugins'] = ['contextmenu'];
             }
             $functionName = $this->getId() . 'ContextMenu';
-            $options['contextmenu'] = ['items' => new JsExpression($functionName)];
+            $options['contextmenu'] = ['items' => new JsExpression($functionName), 'select_node' => false];
             $this->contextMenuOptions($functionName);
         }
         $options = Json::encode($options);
