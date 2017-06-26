@@ -99,7 +99,7 @@ $js = <<<js
     if (clickToOpen) {
       selected.empty()
     }
-    $('#{$id}').val('');
+    $('#{$id}').val('').trigger('change');
   };
   var selectNode = function(node) {
     if (clickToOpen) {
@@ -110,7 +110,7 @@ $js = <<<js
     const val = $('#{$id}').val();
     const selectedNow = val.length > 0 ? val.split(',') : [];
     selectedNow.push(node);
-    $('#{$id}').val(selectedNow.join(','));
+    $('#{$id}').val(selectedNow.join(',')).trigger('change');
   };
 js;
 
