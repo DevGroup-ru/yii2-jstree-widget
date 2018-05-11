@@ -27,13 +27,15 @@ class NodeMoveAction extends Action
     public $rightAttribute = 'rgt';
     /** @var string */
     public $depthAttribute = 'depth';
+    /** @var int */
+    public $depthLimit = false;
 
     /** @var  ActiveRecord */
-    private $node;
+    protected $node;
     /** @var  ActiveRecord */
-    private $parent;
+    protected $parent;
     /** @var  string */
-    private $tableName;
+    protected $tableName;
 
     /**
      * @inheritdoc
@@ -85,6 +87,14 @@ class NodeMoveAction extends Action
         if ((null === $node = $class::findOne($nodeId)) || (null === $parent = $class::findOne($newParentId))) {
             return ['error' => Yii::t('jstw', 'Invalid node id or parent id received!')];
         }
+        if ($this->depthLimit) {
+            $nodeMaxDepth = $node->children()->select(new Expression('MAX(' . $this->depthAttribute . ')'))->scalar();
+            $nodeMaxDepth = $nodeMaxDepth ? $nodeMaxDepth : $node->{$this->depthAttribute};
+            $nodeResultDepth = $parent->{$this->depthAttribute} + ($nodeMaxDepth - $node->{$this->depthAttribute} + 1);
+            if ($nodeResultDepth >= $this->depthLimit) {
+                return ['error' => Yii::t('jstw', 'Can not move node because max depth ({depthLimit}) is exceeded!', ['depthLimit' => $this->depthLimit])];
+            }
+        }
         $this->node = $node;
         $this->parent = $parent;
         if (false !== $this->rootAttribute && ($node->{$this->rootAttribute} != $parent->{$this->rootAttribute})) {
@@ -106,7 +116,7 @@ class NodeMoveAction extends Action
      * @return array|bool
      * @throws \yii\db\Exception
      */
-    public function reorder($oldPosition = null, $position = null, $siblings = [])
+    protected function reorder($oldPosition = null, $position = null, $siblings = [])
     {
         if (null === $oldPosition || null === $position || true === empty($siblings)) {
             return ['error' => Yii::t('jstw', 'Invalid data provided!')];
@@ -192,7 +202,7 @@ class NodeMoveAction extends Action
      * @return array|bool
      * @throws \yii\db\Exception
      */
-    private function move($position = null, $siblings = [], $oldParentId)
+    protected function move($position = null, $siblings = [], $oldParentId)
     {
         $class = $this->className;
         if (null === $oldParent = $class::findOne($oldParentId)) {
@@ -339,7 +349,7 @@ class NodeMoveAction extends Action
      * @return array|bool
      * @throws \yii\db\Exception
      */
-    private function moveMultiRoot($position = null, $siblings = [], $oldParentId)
+    protected function moveMultiRoot($position = null, $siblings = [], $oldParentId)
     {
         $class = $this->className;
         if ((int)$oldParentId == 0) {
@@ -466,7 +476,7 @@ class NodeMoveAction extends Action
      * @param array $ids
      * @return array|\yii\db\ActiveRecord[]
      */
-    private function getLr($ids)
+    protected function getLr($ids)
     {
         $class = $this->className;
         return $class::find()
@@ -483,7 +493,7 @@ class NodeMoveAction extends Action
      * @param array $condition
      * @return int|string
      */
-    public function getCount($condition)
+    protected function getCount($condition)
     {
         $class = $this->className;
         return $class::find()
@@ -499,7 +509,7 @@ class NodeMoveAction extends Action
      * @param array $condition
      * @return array
      */
-    private function getChildIds($condition)
+    protected function getChildIds($condition)
     {
         $class = $this->className;
         return $class::find()
@@ -513,7 +523,7 @@ class NodeMoveAction extends Action
      *
      * @param $condition
      */
-    private function applyRootCondition(&$condition)
+    protected function applyRootCondition(&$condition)
     {
         if (false !== $this->rootAttribute) {
             $condition[] = [$this->rootAttribute => $this->node->{$this->rootAttribute}];
